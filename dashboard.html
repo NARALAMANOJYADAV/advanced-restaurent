@@ -1,0 +1,373 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Admin Dashboard — Marvell Restaurant</title>
+<style>
+:root{
+  --purple:#667eea;--purple-dark:#5568d3;--red:#e74c3c;--green:#27ae60;
+  --orange:#f39c12;--blue:#3498db;--bg:#f0f2f5;--white:#fff;
+  --text:#2d3436;--muted:#636e72;--border:#e0e0e0;--radius:12px;
+  --shadow:0 4px 20px rgba(0,0,0,.08);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text)}
+
+/* LOGIN */
+.login-page{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;
+  background:linear-gradient(135deg,#667eea 0%,#764ba2 100%)}
+.login-card{background:#fff;border-radius:20px;padding:44px 40px;width:100%;max-width:400px;
+  box-shadow:0 20px 60px rgba(0,0,0,.25)}
+.login-logo{text-align:center;margin-bottom:28px}
+.login-logo .icon{font-size:3rem}
+.login-logo h1{font-size:1.5rem;font-weight:800;color:var(--text);margin-top:8px}
+.login-logo p{color:var(--muted);font-size:.88rem;margin-top:4px}
+.form-group{margin-bottom:18px}
+.form-group label{display:block;font-weight:700;font-size:.82rem;text-transform:uppercase;
+  letter-spacing:.4px;color:var(--text);margin-bottom:7px}
+.form-group input{width:100%;padding:12px 16px;border:2px solid var(--border);border-radius:10px;
+  font-size:.95rem;transition:border-color .2s,box-shadow .2s}
+.form-group input:focus{outline:none;border-color:var(--purple);box-shadow:0 0 0 3px rgba(102,126,234,.15)}
+.btn-login{width:100%;padding:13px;background:linear-gradient(135deg,var(--purple-dark),var(--purple));
+  color:#fff;border:none;border-radius:10px;font-size:1rem;font-weight:700;cursor:pointer;
+  transition:all .2s;box-shadow:0 4px 14px rgba(102,126,234,.4)}
+.btn-login:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(102,126,234,.5)}
+.login-err{color:var(--red);font-size:.85rem;text-align:center;margin-bottom:14px;
+  background:#fff5f5;padding:10px;border-radius:8px;display:none}
+.login-err.show{display:block}
+
+/* DASHBOARD */
+.dash{display:none}
+.dash-header{
+  background:linear-gradient(135deg,var(--purple-dark) 0%,var(--purple) 60%,#8b9ff5 100%);
+  color:#fff;padding:0;box-shadow:0 2px 16px rgba(102,126,234,.4);position:sticky;top:0;z-index:100;
+}
+.dash-header-inner{max-width:1200px;margin:0 auto;padding:16px 24px;
+  display:flex;align-items:center;justify-content:space-between}
+.dash-brand{display:flex;align-items:center;gap:12px}
+.dash-brand .icon{font-size:1.8rem}
+.dash-brand h1{font-size:1.3rem;font-weight:800}
+.dash-brand p{font-size:.78rem;opacity:.8;margin-top:2px}
+.dash-actions{display:flex;align-items:center;gap:12px}
+.refresh-btn{
+  background:rgba(255,255,255,.2);border:2px solid rgba(255,255,255,.4);color:#fff;
+  padding:8px 16px;border-radius:8px;cursor:pointer;font-size:.85rem;font-weight:600;
+  transition:all .2s;display:flex;align-items:center;gap:6px;
+}
+.refresh-btn:hover{background:rgba(255,255,255,.35)}
+.btn-logout{background:var(--red);color:#fff;border:none;padding:8px 18px;border-radius:8px;
+  cursor:pointer;font-size:.85rem;font-weight:700;transition:all .2s}
+.btn-logout:hover{background:#c0392b}
+
+/* STATS */
+.stats-wrap{max-width:1200px;margin:0 auto;padding:24px 24px 0;
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px}
+.stat-card{background:#fff;border-radius:var(--radius);padding:22px;box-shadow:var(--shadow);
+  display:flex;align-items:center;gap:16px}
+.stat-icon{width:52px;height:52px;border-radius:12px;display:flex;align-items:center;
+  justify-content:center;font-size:1.5rem;flex-shrink:0}
+.stat-icon.total{background:#e8eaff}
+.stat-icon.pending{background:#fff3cd}
+.stat-icon.preparing{background:#cce5ff}
+.stat-icon.completed{background:#d4edda}
+.stat-icon.cancelled{background:#f8d7da}
+.stat-info h3{font-size:.78rem;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.4px}
+.stat-info .num{font-size:2rem;font-weight:800;color:var(--text);line-height:1.1;margin-top:2px}
+
+/* ORDERS */
+.orders-wrap{max-width:1200px;margin:0 auto;padding:24px}
+.orders-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:12px}
+.orders-header h2{font-size:1.15rem;font-weight:800;color:var(--text)}
+.filter-row{display:flex;gap:8px;flex-wrap:wrap}
+.filter-btn{padding:7px 16px;border:2px solid var(--border);border-radius:50px;background:#fff;
+  font-size:.82rem;font-weight:600;cursor:pointer;transition:all .2s;color:var(--muted)}
+.filter-btn:hover,.filter-btn.active{border-color:var(--purple);color:var(--purple);background:#f0f2ff}
+
+/* TABLE */
+.tbl-wrap{background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}
+.orders-tbl{width:100%;border-collapse:collapse}
+.orders-tbl th{background:#f8f9fa;padding:14px 16px;text-align:left;font-size:.78rem;
+  font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;
+  border-bottom:2px solid var(--border)}
+.orders-tbl td{padding:14px 16px;border-bottom:1px solid #f5f5f5;vertical-align:middle;font-size:.88rem}
+.orders-tbl tr:last-child td{border-bottom:none}
+.orders-tbl tr:hover td{background:#fafafa}
+.order-id{font-weight:800;color:var(--purple)}
+.cust-name{font-weight:700}
+.cust-sub{font-size:.78rem;color:var(--muted);margin-top:2px}
+.items-cell{max-width:200px;font-size:.82rem;line-height:1.5;color:var(--text)}
+.total-cell{font-weight:800;color:var(--text);white-space:nowrap}
+.status-badge{display:inline-block;padding:5px 12px;border-radius:50px;font-size:.75rem;font-weight:700}
+.s-Pending{background:#fff3cd;color:#856404}
+.s-Preparing{background:#cce5ff;color:#004085}
+.s-Completed{background:#d4edda;color:#155724}
+.s-Cancelled{background:#f8d7da;color:#721c24}
+.status-sel{padding:7px 10px;border:2px solid var(--border);border-radius:8px;font-size:.82rem;
+  cursor:pointer;background:#fff;font-family:inherit;font-weight:600;transition:border-color .2s}
+.status-sel:focus{outline:none;border-color:var(--purple)}
+.btn-del{background:#fff0f0;color:var(--red);border:2px solid #ffd0d0;padding:6px 12px;
+  border-radius:8px;cursor:pointer;font-size:.78rem;font-weight:700;transition:all .2s}
+.btn-del:hover{background:var(--red);color:#fff;border-color:var(--red)}
+.time-cell{font-size:.78rem;color:var(--muted);white-space:nowrap}
+
+/* LOADER / EMPTY */
+.loader{text-align:center;padding:60px 20px;color:var(--muted)}
+.spin{display:inline-block;width:36px;height:36px;border:4px solid #f0f0f0;
+  border-top-color:var(--purple);border-radius:50%;animation:spin .8s linear infinite;margin-bottom:12px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.empty-state{text-align:center;padding:60px 20px}
+.empty-state .ei{font-size:3rem;margin-bottom:12px}
+.empty-state p{color:var(--muted);font-size:.95rem}
+
+/* TOAST */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(16px);
+  background:#2d3436;color:#fff;padding:12px 24px;border-radius:50px;font-size:.88rem;
+  font-weight:600;opacity:0;transition:all .3s;z-index:999;pointer-events:none;
+  white-space:nowrap;box-shadow:0 4px 20px rgba(0,0,0,.3)}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+@media(max-width:768px){
+  .orders-tbl thead{display:none}
+  .orders-tbl tr{display:block;border:1px solid var(--border);border-radius:10px;margin-bottom:12px;padding:12px}
+  .orders-tbl td{display:flex;justify-content:space-between;align-items:center;border:none;padding:6px 0}
+  .orders-tbl td::before{content:attr(data-label);font-weight:700;font-size:.78rem;color:var(--muted);text-transform:uppercase}
+  .tbl-wrap{background:transparent;box-shadow:none}
+  .stats-wrap{grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="loginPage" class="login-page">
+  <div class="login-card">
+    <div class="login-logo">
+      <div class="icon">🍽️</div>
+      <h1>Marvell Restaurant</h1>
+      <p>Admin Dashboard</p>
+    </div>
+    <div class="login-err" id="loginErr"></div>
+    <div class="form-group">
+      <label>Username</label>
+      <input type="text" id="uname" placeholder="Enter username" onkeydown="if(event.key==='Enter')doLogin()"/>
+    </div>
+    <div class="form-group">
+      <label>Password</label>
+      <input type="password" id="upass" placeholder="Enter password" onkeydown="if(event.key==='Enter')doLogin()"/>
+    </div>
+    <button class="btn-login" onclick="doLogin()">Login →</button>
+  </div>
+</div>
+
+<!-- DASHBOARD -->
+<div id="dashPage" class="dash">
+  <header class="dash-header">
+    <div class="dash-header-inner">
+      <div class="dash-brand">
+        <span class="icon">🍽️</span>
+        <div>
+          <h1>Marvell Restaurant</h1>
+          <p>Admin Dashboard</p>
+        </div>
+      </div>
+      <div class="dash-actions">
+        <button class="refresh-btn" onclick="loadOrders()">🔄 Refresh</button>
+        <button class="btn-logout" onclick="doLogout()">Logout</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="stats-wrap">
+    <div class="stat-card">
+      <div class="stat-icon total">📋</div>
+      <div class="stat-info"><h3>Total Orders</h3><div class="num" id="sTotal">—</div></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon pending">⏳</div>
+      <div class="stat-info"><h3>Pending</h3><div class="num" id="sPending">—</div></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon preparing">👨‍🍳</div>
+      <div class="stat-info"><h3>Preparing</h3><div class="num" id="sPreparing">—</div></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon completed">✅</div>
+      <div class="stat-info"><h3>Completed</h3><div class="num" id="sCompleted">—</div></div>
+    </div>
+  </div>
+
+  <div class="orders-wrap">
+    <div class="orders-header">
+      <h2>Live Orders</h2>
+      <div class="filter-row">
+        <button class="filter-btn active" data-f="" onclick="setFilter(this,'')">All</button>
+        <button class="filter-btn" data-f="Pending" onclick="setFilter(this,'Pending')">⏳ Pending</button>
+        <button class="filter-btn" data-f="Preparing" onclick="setFilter(this,'Preparing')">👨‍🍳 Preparing</button>
+        <button class="filter-btn" data-f="Completed" onclick="setFilter(this,'Completed')">✅ Completed</button>
+        <button class="filter-btn" data-f="Cancelled" onclick="setFilter(this,'Cancelled')">❌ Cancelled</button>
+      </div>
+    </div>
+    <div class="tbl-wrap">
+      <div id="ordersContainer" class="loader">
+        <div class="spin"></div>
+        <p>Loading orders...</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const API = 'http://localhost:5000/api/orders';
+const ADMIN_USER = 'MANOJ';
+const ADMIN_PASS = 'manoj@007';
+let allOrders = [];
+let activeFilter = '';
+let refreshTimer;
+
+function doLogin(){
+  const u = document.getElementById('uname').value.trim();
+  const p = document.getElementById('upass').value.trim();
+  const err = document.getElementById('loginErr');
+  if(u === ADMIN_USER && p === ADMIN_PASS){
+    localStorage.setItem('marvell_admin','1');
+    showDash();
+  } else {
+    err.textContent = 'Invalid username or password';
+    err.classList.add('show');
+  }
+}
+
+function doLogout(){
+  localStorage.removeItem('marvell_admin');
+  clearInterval(refreshTimer);
+  document.getElementById('dashPage').style.display = 'none';
+  document.getElementById('loginPage').style.display = 'flex';
+  document.getElementById('uname').value = '';
+  document.getElementById('upass').value = '';
+  document.getElementById('loginErr').classList.remove('show');
+}
+
+function showDash(){
+  document.getElementById('loginPage').style.display = 'none';
+  document.getElementById('dashPage').style.display = 'block';
+  loadOrders();
+  refreshTimer = setInterval(loadOrders, 30000);
+}
+
+async function loadOrders(){
+  try {
+    const res = await fetch(API, {headers:{'x-admin-token': ADMIN_PASS}});
+    if(!res.ok) throw new Error('HTTP ' + res.status);
+    allOrders = await res.json();
+    updateStats();
+    renderOrders();
+  } catch(err){
+    document.getElementById('ordersContainer').innerHTML =
+      `<div class="empty-state"><div class="ei">⚠️</div><p>Error loading orders: ${err.message}</p></div>`;
+  }
+}
+
+function updateStats(){
+  document.getElementById('sTotal').textContent    = allOrders.length;
+  document.getElementById('sPending').textContent  = allOrders.filter(o=>o.status==='Pending').length;
+  document.getElementById('sPreparing').textContent= allOrders.filter(o=>o.status==='Preparing').length;
+  document.getElementById('sCompleted').textContent= allOrders.filter(o=>o.status==='Completed').length;
+}
+
+function setFilter(btn, f){
+  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  activeFilter = f;
+  renderOrders();
+}
+
+function renderOrders(){
+  const orders = activeFilter ? allOrders.filter(o=>o.status===activeFilter) : allOrders;
+  const c = document.getElementById('ordersContainer');
+  if(!orders.length){
+    c.innerHTML = `<div class="empty-state"><div class="ei">📭</div><p>No orders${activeFilter?' with status '+activeFilter:''}</p></div>`;
+    return;
+  }
+  const rows = orders.map(o => {
+    const items = (o.order_items||'').replace(/\n/g,'<br>');
+    const time  = o.created_at ? new Date(o.created_at).toLocaleString('en-IN',{hour:'2-digit',minute:'2-digit',day:'2-digit',month:'short'}) : '—';
+    return `<tr>
+      <td data-label="Order"><span class="order-id">#${o.id}</span></td>
+      <td data-label="Table"><strong>${o.table_number||'—'}</strong></td>
+      <td data-label="Customer">
+        <div class="cust-name">${o.customer_name}</div>
+        <div class="cust-sub">${o.customer_phone||''}</div>
+      </td>
+      <td data-label="Items"><div class="items-cell">${items}${o.requirements&&o.requirements!=='None'?`<br><span style="color:var(--red);font-weight:700">📌 ${o.requirements}</span>`:''}</div></td>
+      <td data-label="Total"><span class="total-cell">${o.total_amount}</span></td>
+      <td data-label="Status"><span class="status-badge s-${o.status}">${o.status}</span></td>
+      <td data-label="Update">
+        <select class="status-sel" onchange="updateStatus(${o.id},this.value)">
+          <option value="Pending"   ${o.status==='Pending'   ?'selected':''}>⏳ Pending</option>
+          <option value="Preparing" ${o.status==='Preparing' ?'selected':''}>👨‍🍳 Preparing</option>
+          <option value="Completed" ${o.status==='Completed' ?'selected':''}>✅ Completed</option>
+          <option value="Cancelled" ${o.status==='Cancelled' ?'selected':''}>❌ Cancelled</option>
+        </select>
+      </td>
+      <td data-label="Action">
+        <button class="btn-del" onclick="deleteOrder(${o.id})">🗑 Delete</button>
+      </td>
+      <td data-label="Time"><span class="time-cell">${time}</span></td>
+    </tr>`;
+  }).join('');
+
+  c.innerHTML = `<table class="orders-tbl">
+    <thead><tr>
+      <th>Order</th><th>Table</th><th>Customer</th><th>Items</th>
+      <th>Total</th><th>Status</th><th>Update</th><th>Action</th><th>Time</th>
+    </tr></thead>
+    <tbody>${rows}</tbody>
+  </table>`;
+}
+
+async function updateStatus(id, status){
+  try {
+    const res = await fetch(`${API}/${id}/status`,{
+      method:'PATCH',
+      headers:{'Content-Type':'application/json','x-admin-token':ADMIN_PASS},
+      body: JSON.stringify({status})
+    });
+    if(!res.ok) throw new Error('Failed');
+    toast('Status updated to ' + status);
+    loadOrders();
+  } catch(err){ toast('Error: ' + err.message); }
+}
+
+async function deleteOrder(id){
+  if(!confirm(`Delete order #${id}?`)) return;
+  try {
+    const res = await fetch(`${API}/${id}`,{
+      method:'DELETE',
+      headers:{'x-admin-token':ADMIN_PASS}
+    });
+    if(!res.ok) throw new Error('Failed');
+    toast('Order #' + id + ' deleted');
+    loadOrders();
+  } catch(err){ toast('Error: ' + err.message); }
+}
+
+let toastTimer;
+function toast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=>t.classList.remove('show'), 3000);
+}
+
+// Auto-login if session exists
+window.onload = () => {
+  if(localStorage.getItem('marvell_admin') === '1') showDash();
+};
+</script>
+</body>
+</html>
+ 

@@ -1,0 +1,4 @@
+*.md
+backend/node_modules/
+backend/.env
+index_old.html

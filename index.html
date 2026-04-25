@@ -1,0 +1,1337 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Marvell Restaurant</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --dark:#1a0a0a;
+  --crimson:#c0392b;
+  --red:#e74c3c;
+  --gold:#f39c12;
+  --glass:rgba(255,255,255,0.07);
+  --glass-border:rgba(255,255,255,0.15);
+}
+html{scroll-behavior:smooth;}
+body{
+  font-family:'Poppins',sans-serif;
+  background:var(--dark);
+  color:#fff;
+  min-height:100vh;
+  overflow-x:hidden;
+}
+
+/* ── HERO ── */
+#hero{
+  position:relative;
+  height:100vh;
+  min-height:600px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  background:url('https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=1400&q=80') center/cover no-repeat;
+}
+#hero.hidden{
+  display:none;
+}
+#hero::before{
+  content:'';
+  position:absolute;inset:0;
+  background:linear-gradient(135deg,rgba(26,10,10,0.85) 0%,rgba(192,57,43,0.45) 50%,rgba(26,10,10,0.9) 100%);
+}
+.hero-content{position:relative;z-index:1;padding:0 20px;}
+.hero-badge{
+  display:inline-block;
+  background:rgba(243,156,18,0.2);
+  border:1px solid var(--gold);
+  color:var(--gold);
+  font-size:.75rem;
+  font-weight:600;
+  letter-spacing:3px;
+  text-transform:uppercase;
+  padding:6px 20px;
+  border-radius:50px;
+  margin-bottom:24px;
+  animation:fadeDown .8s ease both;
+}
+.hero-title{
+  font-size:clamp(3rem,8vw,7rem);
+  font-weight:900;
+  line-height:1.05;
+  letter-spacing:-2px;
+  animation:fadeDown .9s .1s ease both;
+  text-shadow:0 4px 30px rgba(0,0,0,0.5);
+}
+.hero-title span{
+  background:linear-gradient(90deg,var(--gold),var(--red));
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  background-clip:text;
+}
+.hero-tagline{
+  font-size:clamp(1rem,2.5vw,1.4rem);
+  font-weight:300;
+  color:rgba(255,255,255,0.8);
+  margin:16px 0 40px;
+  animation:fadeDown 1s .2s ease both;
+}
+.hero-cta{
+  display:inline-block;
+  background:linear-gradient(135deg,var(--crimson),var(--red));
+  color:#fff;
+  font-family:'Poppins',sans-serif;
+  font-size:1.1rem;
+  font-weight:700;
+  padding:18px 50px;
+  border-radius:50px;
+  border:none;
+  cursor:pointer;
+  text-decoration:none;
+  box-shadow:0 0 30px rgba(231,76,60,0.6),0 0 60px rgba(231,76,60,0.3);
+  animation:fadeDown 1s .3s ease both, glowPulse 2s 1.3s ease infinite;
+  transition:transform .2s,box-shadow .2s;
+}
+.hero-cta:hover{transform:translateY(-3px) scale(1.04);box-shadow:0 0 50px rgba(231,76,60,0.8),0 0 80px rgba(231,76,60,0.4);}
+.hero-scroll{
+  position:absolute;
+  bottom:30px;left:50%;
+  transform:translateX(-50%);
+  display:flex;flex-direction:column;align-items:center;gap:8px;
+  color:rgba(255,255,255,0.5);font-size:.75rem;letter-spacing:2px;
+  animation:bounce 2s infinite;
+}
+.hero-scroll::after{
+  content:'';
+  width:1px;height:40px;
+  background:linear-gradient(to bottom,rgba(255,255,255,0.5),transparent);
+}
+
+/* ── APP WRAPPER ── */
+#app{
+  display:none;
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:100px 20px 40px;
+  background:var(--dark);
+}
+
+#app.show{
+  display:flex;
+}
+
+#steps-container{
+  width:100%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.step-page{
+  width:100%;
+  max-width:600px;
+  display:none;
+  animation:fadeUp .5s ease both;
+}
+
+.step-page.active{
+  display:block;
+}
+
+/* ── STEPPER ── */
+.stepper{
+  position:fixed;
+  top:0;
+  left:0;
+  right:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex-wrap:wrap;
+  gap:4px;
+  padding:15px 20px;
+  background:rgba(26,10,10,0.95);
+  border-bottom:1px solid var(--glass-border);
+  backdrop-filter:blur(20px);
+  z-index:100;
+}
+
+#app{
+  margin-top:80px;
+}
+.step-item{
+  display:flex;align-items:center;gap:4px;
+}
+.step-dot{
+  width:32px;height:32px;
+  border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:.7rem;font-weight:700;
+  background:rgba(255,255,255,0.08);
+  border:2px solid rgba(255,255,255,0.15);
+  color:rgba(255,255,255,0.4);
+  transition:all .4s;
+  position:relative;
+}
+.step-dot.active{
+  background:linear-gradient(135deg,var(--crimson),var(--red));
+  border-color:var(--red);
+  color:#fff;
+  box-shadow:0 0 15px rgba(231,76,60,0.6);
+}
+.step-dot.done{
+  background:linear-gradient(135deg,#27ae60,#2ecc71);
+  border-color:#2ecc71;
+  color:#fff;
+}
+.step-line{
+  width:20px;height:2px;
+  background:rgba(255,255,255,0.1);
+  border-radius:2px;
+  transition:background .4s;
+}
+.step-line.done{background:linear-gradient(90deg,#27ae60,#2ecc71);}
+.step-label{
+  font-size:.6rem;
+  color:rgba(255,255,255,0.4);
+  text-align:center;
+  margin-top:4px;
+  transition:color .4s;
+}
+.step-label.active{color:var(--red);}
+.step-label.done{color:#2ecc71;}
+.step-wrapper{display:flex;flex-direction:column;align-items:center;}
+
+/* ── CARDS / PANELS ── */
+.panel{
+  background:var(--glass);
+  border:1px solid var(--glass-border);
+  border-radius:24px;
+  padding:40px;
+  backdrop-filter:blur(20px);
+  animation:fadeUp .5s ease both;
+  width:100%;
+}
+.panel-title{
+  font-size:1.6rem;font-weight:700;
+  margin-bottom:8px;
+}
+.panel-sub{
+  color:rgba(255,255,255,0.5);
+  font-size:.9rem;
+  margin-bottom:28px;
+}
+
+/* ── TABLE GRID ── */
+.table-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(90px,1fr));
+  gap:12px;
+}
+.table-tile{
+  aspect-ratio:1;
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  background:rgba(255,255,255,0.05);
+  border:2px solid rgba(255,255,255,0.1);
+  border-radius:16px;
+  cursor:pointer;
+  transition:all .25s;
+  font-weight:600;
+  font-size:.85rem;
+  gap:6px;
+}
+.table-tile:hover{
+  background:rgba(231,76,60,0.15);
+  border-color:var(--red);
+  transform:translateY(-3px);
+  box-shadow:0 8px 25px rgba(231,76,60,0.2);
+}
+.table-tile.selected{
+  background:linear-gradient(135deg,var(--crimson),var(--red));
+  border-color:var(--red);
+  box-shadow:0 0 20px rgba(231,76,60,0.5);
+}
+.table-tile .t-icon{font-size:1.5rem;}
+.table-tile.takeaway{grid-column:span 2;}
+
+/* ── FORM INPUTS ── */
+.form-group{margin-bottom:20px;}
+.form-group label{
+  display:block;
+  font-size:.85rem;font-weight:600;
+  color:rgba(255,255,255,0.7);
+  margin-bottom:8px;
+  letter-spacing:.5px;
+}
+.form-group input,.form-group select,.form-group textarea{
+  width:100%;
+  background:rgba(255,255,255,0.07);
+  border:1.5px solid rgba(255,255,255,0.15);
+  border-radius:12px;
+  padding:14px 18px;
+  color:#fff;
+  font-family:'Poppins',sans-serif;
+  font-size:.95rem;
+  outline:none;
+  transition:border-color .25s,box-shadow .25s;
+}
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus{
+  border-color:var(--red);
+  box-shadow:0 0 0 3px rgba(231,76,60,0.15);
+}
+.form-group input::placeholder,.form-group textarea::placeholder{color:rgba(255,255,255,0.3);}
+.form-group select option{background:#2d1010;color:#fff;}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+
+/* ── CATEGORY CARDS ── */
+.category-grid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:16px;
+}
+.cat-card{
+  position:relative;
+  height:140px;
+  border-radius:20px;
+  overflow:hidden;
+  cursor:pointer;
+  border:2px solid transparent;
+  transition:all .3s;
+}
+.cat-card img{
+  width:100%;height:100%;
+  object-fit:cover;
+  transition:transform .4s;
+}
+.cat-card::after{
+  content:'';
+  position:absolute;inset:0;
+  background:linear-gradient(to top,rgba(26,10,10,0.85),rgba(26,10,10,0.2));
+  transition:background .3s;
+}
+.cat-card:hover img{transform:scale(1.08);}
+.cat-card:hover::after{background:linear-gradient(to top,rgba(192,57,43,0.85),rgba(192,57,43,0.3));}
+.cat-card.selected{border-color:var(--gold);box-shadow:0 0 25px rgba(243,156,18,0.4);}
+.cat-card.selected::after{background:linear-gradient(to top,rgba(192,57,43,0.9),rgba(243,156,18,0.3));}
+.cat-label{
+  position:absolute;bottom:0;left:0;right:0;
+  z-index:1;
+  padding:16px;
+  font-size:1.1rem;font-weight:700;
+}
+.cat-emoji{font-size:1.8rem;display:block;margin-bottom:4px;}
+
+/* ── MENU ITEMS ── */
+.menu-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
+  gap:16px;
+}
+.menu-card{
+  background:rgba(255,255,255,0.05);
+  border:1.5px solid rgba(255,255,255,0.1);
+  border-radius:20px;
+  overflow:hidden;
+  transition:all .3s;
+  position:relative;
+}
+.menu-card:hover{
+  transform:translateY(-4px);
+  border-color:rgba(231,76,60,0.4);
+  box-shadow:0 12px 35px rgba(0,0,0,0.4);
+}
+.menu-card-img{
+  position:relative;
+  height:150px;
+  overflow:hidden;
+}
+.menu-card-img img{
+  width:100%;height:100%;
+  object-fit:cover;
+  transition:transform .4s;
+}
+.menu-card:hover .menu-card-img img{transform:scale(1.08);}
+.price-badge{
+  position:absolute;top:10px;right:10px;
+  background:linear-gradient(135deg,var(--crimson),var(--red));
+  color:#fff;
+  font-size:.8rem;font-weight:700;
+  padding:4px 10px;
+  border-radius:20px;
+  box-shadow:0 4px 12px rgba(231,76,60,0.4);
+}
+.menu-card-body{padding:14px;}
+.menu-card-name{font-size:.95rem;font-weight:600;margin-bottom:10px;}
+.qty-controls{
+  display:flex;align-items:center;gap:10px;
+}
+.qty-btn{
+  width:30px;height:30px;
+  border-radius:50%;
+  border:none;
+  background:rgba(255,255,255,0.1);
+  color:#fff;
+  font-size:1.1rem;
+  cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:all .2s;
+  line-height:1;
+}
+.qty-btn:hover{background:var(--red);box-shadow:0 0 10px rgba(231,76,60,0.5);}
+.qty-btn.add-btn{background:linear-gradient(135deg,var(--crimson),var(--red));box-shadow:0 0 10px rgba(231,76,60,0.3);}
+.qty-num{
+  font-weight:700;font-size:1rem;
+  min-width:20px;text-align:center;
+}
+
+/* ── CART ── */
+.cart-list{display:flex;flex-direction:column;gap:12px;}
+.cart-item{
+  display:flex;align-items:center;gap:14px;
+  background:rgba(255,255,255,0.05);
+  border:1px solid rgba(255,255,255,0.1);
+  border-radius:16px;
+  padding:14px;
+}
+.cart-item-img{
+  width:60px;height:60px;
+  border-radius:12px;
+  object-fit:cover;
+  flex-shrink:0;
+}
+.cart-item-info{flex:1;}
+.cart-item-name{font-weight:600;font-size:.9rem;}
+.cart-item-price{color:var(--gold);font-size:.85rem;margin-top:2px;}
+.cart-item-controls{display:flex;align-items:center;gap:8px;}
+.cart-total{
+  margin-top:20px;
+  padding:20px;
+  background:linear-gradient(135deg,rgba(192,57,43,0.2),rgba(231,76,60,0.1));
+  border:1px solid rgba(231,76,60,0.3);
+  border-radius:16px;
+  display:flex;justify-content:space-between;align-items:center;
+}
+.cart-total-label{font-size:1rem;color:rgba(255,255,255,0.7);}
+.cart-total-amount{font-size:1.5rem;font-weight:800;color:var(--gold);}
+.empty-cart{
+  text-align:center;padding:40px;
+  color:rgba(255,255,255,0.3);
+}
+.empty-cart .ec-icon{font-size:3rem;margin-bottom:12px;}
+
+/* ── NOTES ── */
+.notes-textarea{
+  width:100%;
+  background:rgba(255,255,255,0.07);
+  border:1.5px solid rgba(255,255,255,0.15);
+  border-radius:12px;
+  padding:16px;
+  color:#fff;
+  font-family:'Poppins',sans-serif;
+  font-size:.95rem;
+  resize:vertical;
+  min-height:120px;
+  outline:none;
+  transition:border-color .25s;
+}
+.notes-textarea:focus{border-color:var(--red);box-shadow:0 0 0 3px rgba(231,76,60,0.15);}
+.notes-textarea::placeholder{color:rgba(255,255,255,0.3);}
+
+/* ── PAYMENT ── */
+.payment-options{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:12px;}
+.pay-option{
+  padding:20px 16px;
+  background:rgba(255,255,255,0.05);
+  border:2px solid rgba(255,255,255,0.1);
+  border-radius:16px;
+  text-align:center;
+  cursor:pointer;
+  transition:all .25s;
+}
+.pay-option:hover{border-color:var(--red);background:rgba(231,76,60,0.1);}
+.pay-option.selected{
+  border-color:var(--gold);
+  background:rgba(243,156,18,0.1);
+  box-shadow:0 0 20px rgba(243,156,18,0.2);
+}
+.pay-icon{font-size:2rem;margin-bottom:8px;}
+.pay-label{font-size:.85rem;font-weight:600;}
+
+/* ── REVIEW ── */
+.review-section{margin-bottom:20px;}
+.review-section h4{
+  font-size:.8rem;font-weight:600;
+  color:rgba(255,255,255,0.5);
+  letter-spacing:2px;
+  text-transform:uppercase;
+  margin-bottom:12px;
+}
+.review-row{
+  display:flex;justify-content:space-between;
+  padding:10px 0;
+  border-bottom:1px solid rgba(255,255,255,0.07);
+  font-size:.9rem;
+}
+.review-row:last-child{border-bottom:none;}
+.review-row span:first-child{color:rgba(255,255,255,0.6);}
+.review-row span:last-child{font-weight:600;}
+.review-items{
+  background:rgba(255,255,255,0.04);
+  border-radius:12px;
+  padding:12px;
+}
+.review-item-row{
+  display:flex;justify-content:space-between;
+  padding:6px 0;
+  font-size:.85rem;
+  border-bottom:1px solid rgba(255,255,255,0.05);
+}
+.review-item-row:last-child{border-bottom:none;}
+.review-grand{
+  margin-top:16px;
+  padding:16px;
+  background:linear-gradient(135deg,rgba(192,57,43,0.25),rgba(231,76,60,0.1));
+  border:1px solid rgba(231,76,60,0.3);
+  border-radius:12px;
+  display:flex;justify-content:space-between;align-items:center;
+}
+.review-grand-label{font-weight:600;}
+.review-grand-amount{font-size:1.4rem;font-weight:800;color:var(--gold);}
+
+/* ── CONFIRMATION ── */
+#step-done{text-align:center;}
+.confetti-container{
+  position:fixed;inset:0;
+  pointer-events:none;
+  z-index:9999;
+  overflow:hidden;
+}
+.confetti-piece{
+  position:absolute;
+  width:10px;height:10px;
+  border-radius:2px;
+  animation:confettiFall linear forwards;
+}
+.done-icon{
+  width:100px;height:100px;
+  background:linear-gradient(135deg,#27ae60,#2ecc71);
+  border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:2.5rem;
+  margin:0 auto 24px;
+  box-shadow:0 0 40px rgba(46,204,113,0.5);
+  animation:popIn .6s cubic-bezier(.175,.885,.32,1.275) both;
+}
+.done-title{font-size:2rem;font-weight:800;margin-bottom:8px;}
+.done-sub{color:rgba(255,255,255,0.6);margin-bottom:30px;}
+.done-details{
+  background:rgba(255,255,255,0.05);
+  border:1px solid rgba(255,255,255,0.1);
+  border-radius:16px;
+  padding:20px;
+  margin-bottom:20px;
+  text-align:left;
+}
+.done-detail-row{
+  display:flex;justify-content:space-between;
+  padding:8px 0;
+  border-bottom:1px solid rgba(255,255,255,0.07);
+  font-size:.9rem;
+}
+.done-detail-row:last-child{border-bottom:none;}
+.done-detail-row span:first-child{color:rgba(255,255,255,0.5);}
+.email-status{
+  padding:12px 20px;
+  border-radius:12px;
+  font-size:.85rem;
+  font-weight:600;
+  margin-bottom:24px;
+}
+.email-status.sent{background:rgba(46,204,113,0.15);border:1px solid rgba(46,204,113,0.3);color:#2ecc71;}
+.email-status.failed{background:rgba(231,76,60,0.15);border:1px solid rgba(231,76,60,0.3);color:var(--red);}
+.email-status.unconfigured{background:rgba(243,156,18,0.15);border:1px solid rgba(243,156,18,0.3);color:var(--gold);}
+
+/* ── BUTTONS ── */
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  padding:14px 32px;
+  border-radius:50px;
+  border:none;
+  font-family:'Poppins',sans-serif;
+  font-size:.95rem;font-weight:700;
+  cursor:pointer;
+  transition:all .25s;
+}
+.btn-primary{
+  background:linear-gradient(135deg,var(--crimson),var(--red));
+  color:#fff;
+  box-shadow:0 4px 20px rgba(231,76,60,0.35);
+}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(231,76,60,0.5);}
+.btn-secondary{
+  background:rgba(255,255,255,0.08);
+  color:rgba(255,255,255,0.8);
+  border:1.5px solid rgba(255,255,255,0.15);
+}
+.btn-secondary:hover{background:rgba(255,255,255,0.14);}
+.btn-gold{
+  background:linear-gradient(135deg,#e67e22,var(--gold));
+  color:#fff;
+  box-shadow:0 4px 20px rgba(243,156,18,0.35);
+}
+.btn-gold:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(243,156,18,0.5);}
+.btn-full{width:100%;}
+.btn-nav{display:flex;justify-content:space-between;margin-top:28px;gap:12px;}
+
+/* ── FAB CART ── */
+#fab-cart{
+  position:fixed;
+  bottom:30px;right:30px;
+  width:64px;height:64px;
+  background:linear-gradient(135deg,var(--crimson),var(--red));
+  border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.5rem;
+  cursor:pointer;
+  box-shadow:0 8px 30px rgba(231,76,60,0.5);
+  z-index:1000;
+  border:none;
+  color:#fff;
+  transition:transform .2s;
+  display:none;
+}
+#fab-cart:hover{transform:scale(1.1);}
+#fab-cart.bounce{animation:fabBounce .5s ease;}
+#fab-badge{
+  position:absolute;top:-4px;right:-4px;
+  background:var(--gold);
+  color:#1a0a0a;
+  font-size:.65rem;font-weight:800;
+  width:22px;height:22px;
+  border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+}
+
+/* ── TOAST ── */
+#toast-container{
+  position:fixed;top:20px;right:20px;
+  z-index:9999;
+  display:flex;flex-direction:column;gap:10px;
+}
+.toast{
+  background:rgba(30,15,15,0.95);
+  border:1px solid rgba(255,255,255,0.15);
+  border-left:4px solid var(--red);
+  border-radius:12px;
+  padding:14px 20px;
+  font-size:.85rem;font-weight:500;
+  backdrop-filter:blur(20px);
+  animation:slideInRight .3s ease both;
+  max-width:300px;
+  box-shadow:0 8px 30px rgba(0,0,0,0.4);
+}
+.toast.success{border-left-color:#2ecc71;}
+.toast.warning{border-left-color:var(--gold);}
+.toast.out{animation:slideOutRight .3s ease forwards;}
+
+/* ── LOADING ── */
+.loading-overlay{
+  position:fixed;inset:0;
+  background:rgba(26,10,10,0.85);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  z-index:9998;
+  backdrop-filter:blur(10px);
+  gap:20px;
+}
+.spinner{
+  width:50px;height:50px;
+  border:4px solid rgba(255,255,255,0.1);
+  border-top-color:var(--red);
+  border-radius:50%;
+  animation:spin 1s linear infinite;
+}
+.loading-text{font-size:1rem;color:rgba(255,255,255,0.7);}
+
+/* ── ANIMATIONS ── */
+@keyframes fadeDown{from{opacity:0;transform:translateY(-20px);}to{opacity:1;transform:translateY(0);}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
+@keyframes glowPulse{0%,100%{box-shadow:0 0 30px rgba(231,76,60,0.6),0 0 60px rgba(231,76,60,0.3);}50%{box-shadow:0 0 50px rgba(231,76,60,0.9),0 0 90px rgba(231,76,60,0.5);}}
+@keyframes bounce{0%,100%{transform:translateX(-50%) translateY(0);}50%{transform:translateX(-50%) translateY(-10px);}}
+@keyframes fabBounce{0%,100%{transform:scale(1);}30%{transform:scale(1.3);}60%{transform:scale(0.9);}80%{transform:scale(1.1);}}
+@keyframes spin{to{transform:rotate(360deg);}}
+@keyframes slideInRight{from{opacity:0;transform:translateX(40px);}to{opacity:1;transform:translateX(0);}}
+@keyframes slideOutRight{from{opacity:1;transform:translateX(0);}to{opacity:0;transform:translateX(40px);}}
+@keyframes popIn{from{opacity:0;transform:scale(0.5);}to{opacity:1;transform:scale(1);}}
+@keyframes confettiFall{0%{transform:translateY(-20px) rotate(0deg);opacity:1;}100%{transform:translateY(100vh) rotate(720deg);opacity:0;}}
+
+/* ── RESPONSIVE ── */
+@media(max-width:600px){
+  .panel{padding:20px;}
+  .form-row{grid-template-columns:1fr;}
+  .category-grid{grid-template-columns:1fr 1fr;}
+  .menu-grid{grid-template-columns:1fr 1fr;}
+  .stepper{gap:2px;}
+  .step-line{width:10px;}
+  .step-dot{width:26px;height:26px;font-size:.6rem;}
+  #fab-cart{bottom:20px;right:20px;width:56px;height:56px;}
+}
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-content">
+    <div class="hero-badge">✦ Fine Dining Experience</div>
+    <h1 class="hero-title">Marvell<br><span>Restaurant</span></h1>
+    <p class="hero-tagline">Crafted with passion. Served with love. Every bite tells a story.</p>
+    <button class="hero-cta" onclick="goToStep(0)">Order Now →</button>
+  </div>
+  <div class="hero-scroll">SCROLL</div>
+</section>
+
+<!-- TOAST CONTAINER -->
+<div id="toast-container"></div>
+
+<!-- FAB CART -->
+<button id="fab-cart" onclick="goToStep(4)">
+  🛒
+  <span id="fab-badge">0</span>
+</button>
+
+<!-- CONFETTI -->
+<div class="confetti-container" id="confetti-container"></div>
+
+<!-- APP -->
+<div id="app">
+  <!-- STEPPER -->
+  <div class="stepper" id="stepper"></div>
+
+  <!-- STEPS -->
+  <div id="steps-container"></div>
+</div>
+
+<!-- LOADING OVERLAY -->
+<div class="loading-overlay" id="loading-overlay" style="display:none;">
+  <div class="spinner"></div>
+  <div class="loading-text">Placing your order...</div>
+</div>
+
+<script>
+// ── EMAIL CONFIG (AJAX) ──
+// Emails are sent via backend AJAX
+// Backend must have EMAIL_USER and EMAIL_PASS configured in .env
+const EMAIL_CONFIG = {
+  endpoint: 'http://localhost:5000/api/send-email'
+};
+
+// ── MENU DATA ──
+const MENU = {
+  Breakfast: [
+    {name:'Masala Dosa',price:80,img:'https://images.unsplash.com/photo-1589301760014-d929f3979dbc?w=400&q=80'},
+    {name:'Idli Sambar',price:60,img:'https://images.unsplash.com/photo-1630383249896-424e482df921?w=400&q=80'},
+    {name:'Poha',price:50,img:'https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=400&q=80'},
+    {name:'Aloo Paratha',price:90,img:'https://images.unsplash.com/photo-1565557623262-b51c2513a641?w=400&q=80'},
+    {name:'Egg Bhurji',price:70,img:'https://images.unsplash.com/photo-1482049016688-2d3e1b311543?w=400&q=80'},
+    {name:'Upma',price:55,img:'https://images.unsplash.com/photo-1601050690597-df0568f70950?w=400&q=80'},
+    {name:'Bread Omelette',price:65,img:'https://images.unsplash.com/photo-1482049016688-2d3e1b311543?w=400&q=80'},
+    {name:'Puri Bhaji',price:75,img:'https://images.unsplash.com/photo-1601050690597-df0568f70950?w=400&q=80'}
+  ],
+  Lunch: [
+    {name:'Veg Thali',price:150,img:'https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=400&q=80'},
+    {name:'Chicken Biryani',price:200,img:'https://images.unsplash.com/photo-1563379091339-03b21ab4a104?w=400&q=80'},
+    {name:'Dal Makhani',price:130,img:'https://images.unsplash.com/photo-1585937421612-70a008356fbe?w=400&q=80'},
+    {name:'Paneer Butter Masala',price:160,img:'https://images.unsplash.com/photo-1631452180519-c014fe946bc7?w=400&q=80'},
+    {name:'Fish Curry',price:220,img:'https://images.unsplash.com/photo-1574484284002-952d92456975?w=400&q=80'},
+    {name:'Rajma Chawal',price:120,img:'https://images.unsplash.com/photo-1585937421612-70a008356fbe?w=400&q=80'},
+    {name:'Mutton Curry',price:260,img:'https://images.unsplash.com/photo-1574484284002-952d92456975?w=400&q=80'},
+    {name:'Chole Bhature',price:110,img:'https://images.unsplash.com/photo-1601050690597-df0568f70950?w=400&q=80'},
+    {name:'Egg Fried Rice',price:140,img:'https://images.unsplash.com/photo-1482049016688-2d3e1b311543?w=400&q=80'}
+  ],
+  Snacks: [
+    {name:'Samosa',price:30,img:'https://images.unsplash.com/photo-1601050690597-df0568f70950?w=400&q=80'},
+    {name:'Veg Burger',price:90,img:'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=400&q=80'},
+    {name:'Chicken Burger',price:120,img:'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=400&q=80'},
+    {name:'French Fries',price:70,img:'https://images.unsplash.com/photo-1573080496219-bb080dd4f877?w=400&q=80'},
+    {name:'Pav Bhaji',price:100,img:'https://images.unsplash.com/photo-1601050690597-df0568f70950?w=400&q=80'},
+    {name:'Chicken Wings',price:160,img:'https://images.unsplash.com/photo-1527477396000-e27163b481c2?w=400&q=80'},
+    {name:'Paneer Tikka',price:150,img:'https://images.unsplash.com/photo-1631452180519-c014fe946bc7?w=400&q=80'},
+    {name:'Spring Rolls',price:80,img:'https://images.unsplash.com/photo-1601050690597-df0568f70950?w=400&q=80'}
+  ],
+  Dinner: [
+    {name:'Butter Naan + Dal',price:140,img:'https://images.unsplash.com/photo-1585937421612-70a008356fbe?w=400&q=80'},
+    {name:'Chicken Tikka Masala',price:240,img:'https://images.unsplash.com/photo-1527477396000-e27163b481c2?w=400&q=80'},
+    {name:'Veg Biryani',price:160,img:'https://images.unsplash.com/photo-1563379091339-03b21ab4a104?w=400&q=80'},
+    {name:'Mutton Rogan Josh',price:280,img:'https://images.unsplash.com/photo-1574484284002-952d92456975?w=400&q=80'},
+    {name:'Palak Paneer',price:170,img:'https://images.unsplash.com/photo-1631452180519-c014fe946bc7?w=400&q=80'},
+    {name:'Prawn Masala',price:300,img:'https://images.unsplash.com/photo-1574484284002-952d92456975?w=400&q=80'},
+    {name:'Kadai Paneer',price:180,img:'https://images.unsplash.com/photo-1631452180519-c014fe946bc7?w=400&q=80'},
+    {name:'Tandoori Chicken',price:260,img:'https://images.unsplash.com/photo-1527477396000-e27163b481c2?w=400&q=80'},
+    {name:'Gulab Jamun',price:60,img:'https://images.unsplash.com/photo-1601050690597-df0568f70950?w=400&q=80'}
+  ]
+};
+
+const CAT_META = {
+  Breakfast:{emoji:'🌅',img:'https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=600&q=80'},
+  Lunch:    {emoji:'☀️',img:'https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=600&q=80'},
+  Snacks:   {emoji:'🍟',img:'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=600&q=80'},
+  Dinner:   {emoji:'🌙',img:'https://images.unsplash.com/photo-1574484284002-952d92456975?w=600&q=80'}
+};
+
+const STEPS = ['Table','Details','Category','Menu','Cart','Notes','Payment','Review','Done'];
+const PAYMENT_OPTIONS = [
+  {id:'cash',icon:'💵',label:'Cash'},
+  {id:'card',icon:'💳',label:'Card'},
+  {id:'upi',icon:'📱',label:'UPI'},
+  {id:'wallet',icon:'👛',label:'Wallet'}
+];
+
+// ── STATE ──
+let state = {
+  step: 0,
+  table: null,
+  name: '',
+  phone: '',
+  email: '',
+  guests: 1,
+  category: null,
+  cart: {},       // key: "Category|ItemName" => {item, qty}
+  notes: '',
+  payment: null,
+  orderId: null,
+  emailStatus: 'unconfigured'
+};
+
+// ── INIT ──
+function init() {
+  renderStepper();
+  renderStep();
+}
+
+// ── STEPPER ──
+function renderStepper() {
+  const el = document.getElementById('stepper');
+  el.innerHTML = STEPS.map((s, i) => {
+    const cls = i < state.step ? 'done' : i === state.step ? 'active' : '';
+    const lineCls = i < state.step ? 'done' : '';
+    const icon = i < state.step ? '✓' : i + 1;
+    return `
+      <div class="step-wrapper">
+        <div class="step-item">
+          <div class="step-dot ${cls}">${icon}</div>
+          ${i < STEPS.length - 1 ? `<div class="step-line ${lineCls}"></div>` : ''}
+        </div>
+        <div class="step-label ${cls}">${s}</div>
+      </div>`;
+  }).join('');
+}
+
+// ── RENDER STEP ──
+function renderStep() {
+  try {
+    renderStepper();
+    const container = document.getElementById('steps-container');
+    if (!container) {
+      console.error('steps-container not found');
+      return;
+    }
+    
+    const renders = [
+      renderTable, renderDetails, renderCategory, renderMenu,
+      renderCart, renderNotes, renderPayment, renderReview, renderDone
+    ];
+    
+    // Hide all steps
+    const allSteps = container.querySelectorAll('.step-page');
+    allSteps.forEach(step => step.classList.remove('active'));
+    
+    // Show current step
+    let currentStep = container.querySelector(`[data-step="${state.step}"]`);
+    if (!currentStep) {
+      currentStep = document.createElement('div');
+      currentStep.className = 'step-page';
+      currentStep.setAttribute('data-step', state.step);
+      currentStep.innerHTML = `<div class="panel">${renders[state.step]()}</div>`;
+      container.appendChild(currentStep);
+    } else {
+      currentStep.innerHTML = `<div class="panel">${renders[state.step]()}</div>`;
+    }
+    
+    currentStep.classList.add('active');
+    updateFAB();
+    window.scrollTo({top: 0, behavior: 'smooth'});
+  } catch (err) {
+    console.error('renderStep error:', err);
+  }
+}
+
+function goToStep(n) {
+  state.step = n;
+  document.getElementById('hero').classList.add('hidden');
+  document.getElementById('app').classList.add('show');
+  renderStep();
+}
+
+// ── STEP 0: TABLE ──
+function renderTable() {
+  const tables = ['T1','T2','T3','T4','T5','T6','T7','T8','T9','T10','T11','T12'];
+  return `
+    <div class="panel-title">🪑 Select Your Table</div>
+    <div class="panel-sub">Choose a table or select Takeaway</div>
+    <div class="table-grid">
+      ${tables.map(t => `
+        <div class="table-tile ${state.table===t?'selected':''}" onclick="selectTable('${t}')">
+          <span class="t-icon">🪑</span>${t}
+        </div>`).join('')}
+      <div class="table-tile takeaway ${state.table==='Takeaway'?'selected':''}" onclick="selectTable('Takeaway')">
+        <span class="t-icon">🥡</span>Takeaway
+      </div>
+    </div>
+    <div class="btn-nav">
+      <span></span>
+      <button class="btn btn-primary" onclick="nextStep()">Continue →</button>
+    </div>`;
+}
+
+function selectTable(t) {
+  state.table = t;
+  renderStep();
+}
+
+// ── STEP 1: DETAILS ──
+function renderDetails() {
+  return `
+    <div class="panel-title">👤 Your Details</div>
+    <div class="panel-sub">Tell us a bit about yourself</div>
+    <div class="form-group">
+      <label>Full Name *</label>
+      <input type="text" id="inp-name" placeholder="e.g. Rahul Sharma" value="${state.name}" oninput="state.name=this.value">
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Phone Number *</label>
+        <input type="tel" id="inp-phone" placeholder="10-digit number" value="${state.phone}" oninput="state.phone=this.value">
+      </div>
+      <div class="form-group">
+        <label>Email (for confirmation)</label>
+        <input type="email" id="inp-email" placeholder="you@example.com" value="${state.email}" oninput="state.email=this.value">
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Number of Guests</label>
+      <select id="inp-guests" onchange="state.guests=this.value">
+        ${[1,2,3,4,5,6,7,8].map(n=>`<option value="${n}" ${state.guests==n?'selected':''}>${n} Guest${n>1?'s':''}</option>`).join('')}
+      </select>
+    </div>
+    <div class="btn-nav">
+      <button class="btn btn-secondary" onclick="goToStep(0)">← Back</button>
+      <button class="btn btn-primary" onclick="nextStep()">Continue →</button>
+    </div>`;
+}
+
+// ── STEP 2: CATEGORY ──
+function renderCategory() {
+  return `
+    <div class="panel-title">🍽️ Choose Category</div>
+    <div class="panel-sub">What are you in the mood for?</div>
+    <div class="category-grid">
+      ${Object.keys(MENU).map(cat => `
+        <div class="cat-card ${state.category===cat?'selected':''}" onclick="selectCategory('${cat}')">
+          <img src="${CAT_META[cat].img}" alt="${cat}" loading="lazy">
+          <div class="cat-label">
+            <span class="cat-emoji">${CAT_META[cat].emoji}</span>${cat}
+          </div>
+        </div>`).join('')}
+    </div>
+    <div class="btn-nav">
+      <button class="btn btn-secondary" onclick="goToStep(1)">← Back</button>
+      <button class="btn btn-primary" onclick="nextStep()">Continue →</button>
+    </div>`;
+}
+
+function selectCategory(cat) {
+  state.category = cat;
+  renderStep();
+}
+
+// ── STEP 3: MENU ──
+function renderMenu() {
+  const items = MENU[state.category] || [];
+  return `
+    <div class="panel-title">${CAT_META[state.category].emoji} ${state.category} Menu</div>
+    <div class="panel-sub">Add items to your cart</div>
+    <div class="menu-grid">
+      ${items.map((item, idx) => {
+        const key = `${state.category}|${item.name}`;
+        const qty = state.cart[key] ? state.cart[key].qty : 0;
+        return `
+          <div class="menu-card">
+            <div class="menu-card-img">
+              <img src="${item.img}" alt="${item.name}" loading="lazy">
+              <div class="price-badge">₹${item.price}</div>
+            </div>
+            <div class="menu-card-body">
+              <div class="menu-card-name">${item.name}</div>
+              <div class="qty-controls">
+                <button class="qty-btn" onclick="changeQty('${state.category}','${item.name}',${idx},-1)">−</button>
+                <span class="qty-num" id="qty-${state.category}-${idx}">${qty}</span>
+                <button class="qty-btn add-btn" onclick="changeQty('${state.category}','${item.name}',${idx},1)">+</button>
+              </div>
+            </div>
+          </div>`;
+      }).join('')}
+    </div>
+    <div class="btn-nav">
+      <button class="btn btn-secondary" onclick="goToStep(2)">← Back</button>
+      <button class="btn btn-primary" onclick="nextStep()">View Cart →</button>
+    </div>`;
+}
+
+function changeQty(cat, name, idx, delta) {
+  const key = `${cat}|${name}`;
+  const item = MENU[cat].find(i => i.name === name);
+  if (!state.cart[key]) state.cart[key] = {item, qty: 0};
+  state.cart[key].qty = Math.max(0, state.cart[key].qty + delta);
+  if (state.cart[key].qty === 0) delete state.cart[key];
+  const el = document.getElementById(`qty-${cat}-${idx}`);
+  if (el) el.textContent = state.cart[key] ? state.cart[key].qty : 0;
+  updateFAB();
+  if (delta > 0) {
+    showToast(`${name} added to cart 🛒`, 'success');
+    const fab = document.getElementById('fab-cart');
+    fab.classList.remove('bounce');
+    void fab.offsetWidth;
+    fab.classList.add('bounce');
+  }
+}
+
+// ── STEP 4: CART ──
+function renderCart() {
+  const entries = Object.values(state.cart);
+  if (entries.length === 0) {
+    return `
+      <div class="panel-title">🛒 Your Cart</div>
+      <div class="empty-cart">
+        <div class="ec-icon">🛒</div>
+        <div>Your cart is empty</div>
+        <div style="font-size:.8rem;margin-top:8px;color:rgba(255,255,255,0.2)">Go back and add some items</div>
+      </div>
+      <div class="btn-nav">
+        <button class="btn btn-secondary" onclick="goToStep(3)">← Add Items</button>
+        <span></span>
+      </div>`;
+  }
+  const total = cartTotal();
+  return `
+    <div class="panel-title">🛒 Your Cart</div>
+    <div class="panel-sub">${entries.length} item type${entries.length>1?'s':''} · ₹${total}</div>
+    <div class="cart-list">
+      ${entries.map(({item, qty}) => {
+        const key = `${state.category}|${item.name}`;
+        return `
+          <div class="cart-item">
+            <img class="cart-item-img" src="${item.img}" alt="${item.name}">
+            <div class="cart-item-info">
+              <div class="cart-item-name">${item.name}</div>
+              <div class="cart-item-price">₹${item.price} × ${qty} = ₹${item.price * qty}</div>
+            </div>
+            <div class="cart-item-controls">
+              <button class="qty-btn" onclick="cartChangeQty('${item.name}', -1)">−</button>
+              <span class="qty-num">${qty}</span>
+              <button class="qty-btn add-btn" onclick="cartChangeQty('${item.name}', 1)">+</button>
+            </div>
+          </div>`;
+      }).join('')}
+    </div>
+    <div class="cart-total">
+      <span class="cart-total-label">Total Amount</span>
+      <span class="cart-total-amount">₹${total}</span>
+    </div>
+    <div class="btn-nav">
+      <button class="btn btn-secondary" onclick="goToStep(3)">← Menu</button>
+      <button class="btn btn-primary" onclick="nextStep()">Continue →</button>
+    </div>`;
+}
+
+function cartChangeQty(name, delta) {
+  const key = Object.keys(state.cart).find(k => k.endsWith('|' + name));
+  if (!key) return;
+  state.cart[key].qty = Math.max(0, state.cart[key].qty + delta);
+  if (state.cart[key].qty === 0) delete state.cart[key];
+  updateFAB();
+  renderStep();
+}
+
+function cartTotal() {
+  return Object.values(state.cart).reduce((s, {item, qty}) => s + item.price * qty, 0);
+}
+
+function updateFAB() {
+  const fab = document.getElementById('fab-cart');
+  const badge = document.getElementById('fab-badge');
+  const total = Object.values(state.cart).reduce((s, {qty}) => s + qty, 0);
+  badge.textContent = total;
+  fab.style.display = total > 0 ? 'flex' : 'none';
+}
+
+// ── STEP 5: NOTES ──
+function renderNotes() {
+  return `
+    <div class="panel-title">📝 Special Instructions</div>
+    <div class="panel-sub">Any allergies, preferences, or special requests?</div>
+    <div class="form-group">
+      <label>Notes (optional)</label>
+      <textarea class="notes-textarea" placeholder="e.g. Less spicy, no onions, extra sauce..." oninput="state.notes=this.value">${state.notes}</textarea>
+    </div>
+    <div class="btn-nav">
+      <button class="btn btn-secondary" onclick="goToStep(4)">← Cart</button>
+      <button class="btn btn-primary" onclick="nextStep()">Continue →</button>
+    </div>`;
+}
+
+// ── STEP 6: PAYMENT ──
+function renderPayment() {
+  return `
+    <div class="panel-title">💳 Payment Method</div>
+    <div class="panel-sub">How would you like to pay?</div>
+    <div class="payment-options">
+      ${PAYMENT_OPTIONS.map(p => `
+        <div class="pay-option ${state.payment===p.id?'selected':''}" onclick="selectPayment('${p.id}')">
+          <div class="pay-icon">${p.icon}</div>
+          <div class="pay-label">${p.label}</div>
+        </div>`).join('')}
+    </div>
+    <div class="btn-nav">
+      <button class="btn btn-secondary" onclick="goToStep(5)">← Notes</button>
+      <button class="btn btn-primary" onclick="nextStep()">Review Order →</button>
+    </div>`;
+}
+
+function selectPayment(id) {
+  state.payment = id;
+  renderStep();
+}
+
+// ── STEP 7: REVIEW ──
+function renderReview() {
+  const entries = Object.values(state.cart);
+  const total = cartTotal();
+  const payLabel = PAYMENT_OPTIONS.find(p => p.id === state.payment)?.label || state.payment;
+  return `
+    <div class="panel-title">📋 Review Your Order</div>
+    <div class="panel-sub">Everything look good?</div>
+    <div class="review-section">
+      <h4>Order Info</h4>
+      <div class="review-row"><span>Table</span><span>${state.table}</span></div>
+      <div class="review-row"><span>Name</span><span>${state.name}</span></div>
+      <div class="review-row"><span>Phone</span><span>${state.phone}</span></div>
+      ${state.email ? `<div class="review-row"><span>Email</span><span>${state.email}</span></div>` : ''}
+      <div class="review-row"><span>Guests</span><span>${state.guests}</span></div>
+      <div class="review-row"><span>Category</span><span>${state.category}</span></div>
+      <div class="review-row"><span>Payment</span><span>${payLabel}</span></div>
+      ${state.notes ? `<div class="review-row"><span>Notes</span><span style="max-width:200px;text-align:right">${state.notes}</span></div>` : ''}
+    </div>
+    <div class="review-section">
+      <h4>Items Ordered</h4>
+      <div class="review-items">
+        ${entries.map(({item, qty}) => `
+          <div class="review-item-row">
+            <span>${item.name} × ${qty}</span>
+            <span style="color:var(--gold)">₹${item.price * qty}</span>
+          </div>`).join('')}
+      </div>
+      <div class="review-grand">
+        <span class="review-grand-label">Grand Total</span>
+        <span class="review-grand-amount">₹${total}</span>
+      </div>
+    </div>
+    <div class="btn-nav">
+      <button class="btn btn-secondary" onclick="goToStep(6)">← Payment</button>
+      <button class="btn btn-gold" onclick="placeOrder()">🎉 Place Order</button>
+    </div>`;
+}
+
+// ── STEP 8: DONE ──
+function renderDone() {
+  const total = cartTotal();
+  const emailIcon = state.emailStatus === 'sent' ? '✉️ Confirmation email sent!' :
+                    state.emailStatus === 'failed' ? '⚠️ Email delivery failed' :
+                    '📧 Email not configured (demo mode)';
+  const emailCls = state.emailStatus === 'sent' ? 'sent' :
+                   state.emailStatus === 'failed' ? 'failed' : 'unconfigured';
+  return `
+    <div id="step-done">
+      <div class="done-icon">✓</div>
+      <div class="done-title">Order Placed!</div>
+      <div class="done-sub">Your delicious food is being prepared 🍽️</div>
+      <div class="email-status ${emailCls}">${emailIcon}</div>
+      <div class="done-details">
+        <div class="done-detail-row"><span>Order ID</span><span style="color:var(--gold);font-weight:700">#${state.orderId || 'MRV' + Date.now().toString().slice(-6)}</span></div>
+        <div class="done-detail-row"><span>Table</span><span>${state.table}</span></div>
+        <div class="done-detail-row"><span>Name</span><span>${state.name}</span></div>
+        <div class="done-detail-row"><span>Items</span><span>${Object.values(state.cart).reduce((s,{qty})=>s+qty,0)}</span></div>
+        <div class="done-detail-row"><span>Total Paid</span><span style="color:var(--gold);font-weight:700">₹${total}</span></div>
+        <div class="done-detail-row"><span>Payment</span><span>${PAYMENT_OPTIONS.find(p=>p.id===state.payment)?.label || state.payment}</span></div>
+      </div>
+      <button class="btn btn-primary btn-full" onclick="resetOrder()">🔄 New Order</button>
+    </div>`;
+}
+
+function resetOrder() {
+  state = {step:0,table:null,name:'',phone:'',email:'',guests:1,category:null,cart:{},notes:'',payment:null,orderId:null,emailStatus:'unconfigured'};
+  renderStep();
+  document.getElementById('app').scrollIntoView({behavior:'smooth'});
+}
+
+// ── PLACE ORDER ──
+async function placeOrder() {
+  const overlay = document.getElementById('loading-overlay');
+  overlay.style.display = 'flex';
+  const itemsStr = Object.values(state.cart).map(({item,qty}) => `${item.name} x${qty} - Rs.${item.price*qty}`).join('\n');
+  const payload = {
+    table_number:   state.table,
+    customer_name:  state.name,
+    customer_email: state.email,
+    customer_phone: state.phone,
+    category:       state.category,
+    order_items:    itemsStr,
+    total_amount:   'Rs.' + cartTotal(),
+    requirements:   state.notes || 'None',
+    payment_method: PAYMENT_OPTIONS.find(p=>p.id===state.payment)?.label || state.payment
+  };
+  try {
+    const res = await fetch('http://localhost:5000/api/orders', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify(payload)
+    });
+    const data = await res.json();
+    if (!res.ok || !data.success) throw new Error(data.message || 'Order failed');
+    state.orderId = data.order?.id || ('MRV' + Date.now().toString().slice(-6));
+    showToast('Order placed successfully! 🎉', 'success');
+  } catch (err) {
+    console.warn('API error:', err.message);
+    state.orderId = 'MRV' + Date.now().toString().slice(-6);
+    showToast('⚠️ ' + err.message, 'warning');
+  }
+  overlay.style.display = 'none';
+  await sendConfirmationEmail(payload);
+  state.step = 8;
+  renderStep();
+  launchConfetti();
+}
+
+// ── EMAIL (AJAX) ──
+async function sendConfirmationEmail(payload) {
+  if (!state.email) {
+    state.emailStatus = 'unconfigured';
+    return;
+  }
+  try {
+    const response = await fetch(EMAIL_CONFIG.endpoint, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        to: state.email,
+        customer_name: state.name,
+        order_id: state.orderId,
+        table_number: state.table,
+        category: state.category,
+        order_items: payload.order_items,
+        total_amount: payload.total_amount,
+        payment_method: payload.payment_method,
+        requirements: payload.requirements,
+        order_time: new Date().toLocaleString('en-IN', {dateStyle: 'medium', timeStyle: 'short'}),
+        restaurant_name: 'Marvell Restaurant'
+      })
+    });
+    const data = await response.json();
+    if (data.success) {
+      state.emailStatus = 'sent';
+      showToast('✉️ Confirmation email sent!', 'success');
+    } else {
+      state.emailStatus = 'failed';
+      showToast('⚠️ Email delivery failed', 'warning');
+    }
+  } catch (err) {
+    console.warn('Email error:', err);
+    state.emailStatus = 'failed';
+    showToast('⚠️ Email delivery failed', 'warning');
+  }
+}
+
+// ── VALIDATION & NAVIGATION ──
+function nextStep() {
+  if (!validate()) return;
+  state.step++;
+  renderStep();
+  document.getElementById('app').scrollIntoView({behavior:'smooth'});
+}
+
+function validate() {
+  switch (state.step) {
+    case 0:
+      if (!state.table) { showToast('Please select a table or Takeaway', 'error'); return false; }
+      break;
+    case 1:
+      if (!state.name.trim()) { showToast('Please enter your name', 'error'); return false; }
+      if (!state.phone.trim() || !/^\d{10}$/.test(state.phone.trim())) { showToast('Enter a valid 10-digit phone number', 'error'); return false; }
+      break;
+    case 2:
+      if (!state.category) { showToast('Please select a category', 'error'); return false; }
+      break;
+    case 3:
+      if (Object.keys(state.cart).length === 0) { showToast('Add at least one item to cart', 'error'); return false; }
+      break;
+    case 6:
+      if (!state.payment) { showToast('Please select a payment method', 'error'); return false; }
+      break;
+  }
+  return true;
+}
+
+// ── TOAST ──
+function showToast(msg, type = 'info') {
+  const container = document.getElementById('toast-container');
+  const toast = document.createElement('div');
+  toast.className = `toast ${type === 'success' ? 'success' : type === 'warning' ? 'warning' : ''}`;
+  toast.textContent = msg;
+  container.appendChild(toast);
+  setTimeout(() => {
+    toast.classList.add('out');
+    setTimeout(() => toast.remove(), 300);
+  }, 3000);
+}
+
+// ── CONFETTI ──
+function launchConfetti() {
+  const container = document.getElementById('confetti-container');
+  const colors = ['#e74c3c','#f39c12','#2ecc71','#3498db','#9b59b6','#fff','#c0392b'];
+  for (let i = 0; i < 80; i++) {
+    const piece = document.createElement('div');
+    piece.className = 'confetti-piece';
+    piece.style.cssText = `
+      left:${Math.random()*100}%;
+      background:${colors[Math.floor(Math.random()*colors.length)]};
+      width:${6+Math.random()*8}px;
+      height:${6+Math.random()*8}px;
+      border-radius:${Math.random()>0.5?'50%':'2px'};
+      animation-duration:${2+Math.random()*2}s;
+      animation-delay:${Math.random()*1}s;
+    `;
+    container.appendChild(piece);
+  }
+  setTimeout(() => { container.innerHTML = ''; }, 5000);
+}
+
+// ── START ──
+init();
+</script>
+</body>
+</html>
