@@ -13,7 +13,9 @@ const allowedOrigins = process.env.ALLOWED_ORIGINS
 
 app.use(cors({
   origin: (origin, cb) => {
-    if (!origin || origin === 'null' || allowedOrigins.includes(origin)) return cb(null, true);
+    if (!origin || origin === 'null' || allowedOrigins.includes(origin) || allowedOrigins.includes('*')) {
+      return cb(null, true);
+    }
     cb(new Error('Not allowed by CORS'));
   },
   methods: ['GET', 'POST', 'PATCH', 'DELETE'],
