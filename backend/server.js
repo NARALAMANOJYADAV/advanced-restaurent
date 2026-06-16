@@ -238,25 +238,90 @@ app.delete('/api/orders/:id', adminAuth, async (req, res) => {
 
 // POST /api/send-email
 app.post('/api/send-email', async (req, res) => {
-  const { to, customer_name, order_id, order_items, total_amount, payment_method, table_number } = req.body;
-  if (!to || !order_id) return res.status(400).json({ success: false, message: 'Missing fields' });
-  if (!transporter) return res.json({ success: false, message: 'Email not configured' });
-  const itemsHtml = (order_items || '').replace(/\n/g, '<br>');
-  try {
-    await transporter.sendMail({
-      from: process.env.EMAIL_USER,
-      to,
-      subject: `Order Confirmed #${order_id} - Marvell Restaurant`,
-      html: `<h2>Thank you, ${customer_name}!</h2>
-        <p>Order <b>#${order_id}</b> confirmed.</p>
-        <p><b>Table:</b> ${table_number}</p>
-        <p><b>Items:</b><br>${itemsHtml}</p>
-        <p><b>Total: ${total_amount}</b></p>
-        <p><b>Payment:</b> ${payment_method}</p>`
+  const { to, customer_name, order_id, order_items, total_amount, payment_method, table_number, requirements, restaurant_name } = req.body;
+  
+  console.log('📧 [AJAX Email Request] Received:', { to, order_id, customer_name });
+  
+  // Validation
+  if (!to || !order_id) {
+    console.warn('❌ [AJAX Email] Missing required fields:', { to, order_id });
+    return res.status(400).json({ success: false, message: 'Missing required fields: to, order_id' });
+  }
+  
+  // Email validation
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(to)) {
+    console.warn('❌ [AJAX Email] Invalid email format:', to);
+    return res.status(400).json({ success: false, message: 'Invalid email format' });
+  }
+  
+  // Check if transporter is configured
+  if (!transporter) {
+    console.warn('❌ [AJAX Email] Email service not configured in .env');
+    return res.status(503).json({ 
+      success: false, 
+      message: 'Email service not configured. Please set EMAIL_USER and EMAIL_PASS in .env' 
     });
-    res.json({ success: true });
+  }
+  
+  try {
+    const itemsHtml = (order_items || '').replace(/\n/g, '<br>');
+    const emailContent = {
+      from: process.env.EMAIL_USER,
+      to: to,
+      subject: `Order Confirmed #${order_id} - ${restaurant_name || 'Marvell Restaurant'}`,
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+          <h2 style="color: #e74c3c;">✓ Thank you, ${customer_name}!</h2>
+          <p style="font-size: 16px; color: #333;">Your order <b>#${order_id}</b> has been confirmed and is being prepared.</p>
+          
+          <div style="background: #f5f5f5; padding: 20px; border-radius: 8px; margin: 20px 0;">
+            <h3 style="color: #333; border-bottom: 2px solid #e74c3c; padding-bottom: 10px;">Order Details</h3>
+            <p><b>Restaurant:</b> ${restaurant_name || 'Marvell Restaurant'}</p>
+            <p><b>Table Number:</b> ${table_number}</p>
+            <p><b>Items:</b><br>${itemsHtml}</p>
+            <p><b>Total Amount:</b> <span style="color: #e74c3c; font-size: 18px; font-weight: bold;">${total_amount}</span></p>
+            <p><b>Payment Method:</b> ${payment_method}</p>
+            ${requirements && requirements !== 'None' ? `<p><b>Special Instructions:</b> ${requirements}</p>` : ''}
+          </div>
+          
+          <p style="color: #666; font-size: 14px;">We'll serve you shortly! Thank you for your order. 🍽️</p>
+          <hr style="border: none; border-top: 1px solid #ddd; margin: 20px 0;">
+          <p style="color: #999; font-size: 12px; text-align: center;">This is an automated confirmation email. Please do not reply to this email.</p>
+        </div>
+      `
+    };
+    
+    console.log('📧 [AJAX Email] Sending to:', to);
+    
+    const info = await transporter.sendMail(emailContent);
+    
+    console.log('✅ [AJAX Email] Sent successfully:', { 
+      to: to, 
+      orderId: order_id, 
+      messageId: info.messageId,
+      timestamp: new Date().toISOString()
+    });
+    
+    res.status(200).json({ 
+      success: true, 
+      message: 'Email sent successfully',
+      messageId: info.messageId,
+      email: to
+    });
+    
   } catch (err) {
-    res.json({ success: false, message: err.message });
+    console.error('❌ [AJAX Email] Error sending email:', {
+      error: err.message,
+      to: to,
+      orderId: order_id,
+      timestamp: new Date().toISOString()
+    });
+    
+    res.status(500).json({ 
+      success: false, 
+      message: 'Failed to send email: ' + err.message 
+    });
   }
 });
 
