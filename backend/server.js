@@ -21,6 +21,7 @@ app.use(cors({
 }));
 
 app.use(express.json());
+app.use(express.static('public'));
 
 // In-memory fallback store
 let mockOrders = [];
@@ -155,7 +156,7 @@ app.get('/api/orders', adminAuth, async (req, res) => {
     const params = [];
     const conditions = [];
     if (status) { params.push(status); conditions.push(`status = $${params.length}`); }
-    if (table)  { params.push(table);  conditions.push(`table_number = $${params.length}`); }
+    if (table) { params.push(table); conditions.push(`table_number = $${params.length}`); }
     if (conditions.length) query += ' WHERE ' + conditions.join(' AND ');
     query += ' ORDER BY created_at DESC LIMIT 200';
     const result = await pool.query(query, params);
@@ -170,8 +171,8 @@ app.get('/api/orders', adminAuth, async (req, res) => {
 app.get('/api/orders/stats', adminAuth, async (req, res) => {
   if (!pool) {
     return res.json({
-      total:     mockOrders.length,
-      pending:   mockOrders.filter(o => o.status === 'Pending').length,
+      total: mockOrders.length,
+      pending: mockOrders.filter(o => o.status === 'Pending').length,
       preparing: mockOrders.filter(o => o.status === 'Preparing').length,
       completed: mockOrders.filter(o => o.status === 'Completed').length,
       revenue: 0
@@ -239,31 +240,31 @@ app.delete('/api/orders/:id', adminAuth, async (req, res) => {
 // POST /api/send-email
 app.post('/api/send-email', async (req, res) => {
   const { to, customer_name, order_id, order_items, total_amount, payment_method, table_number, requirements, restaurant_name } = req.body;
-  
+
   console.log('📧 [AJAX Email Request] Received:', { to, order_id, customer_name });
-  
+
   // Validation
   if (!to || !order_id) {
     console.warn('❌ [AJAX Email] Missing required fields:', { to, order_id });
     return res.status(400).json({ success: false, message: 'Missing required fields: to, order_id' });
   }
-  
+
   // Email validation
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!emailRegex.test(to)) {
     console.warn('❌ [AJAX Email] Invalid email format:', to);
     return res.status(400).json({ success: false, message: 'Invalid email format' });
   }
-  
+
   // Check if transporter is configured
   if (!transporter) {
     console.warn('❌ [AJAX Email] Email service not configured in .env');
-    return res.status(503).json({ 
-      success: false, 
-      message: 'Email service not configured. Please set EMAIL_USER and EMAIL_PASS in .env' 
+    return res.status(503).json({
+      success: false,
+      message: 'Email service not configured. Please set EMAIL_USER and EMAIL_PASS in .env'
     });
   }
-  
+
   try {
     const itemsHtml = (order_items || '').replace(/\n/g, '<br>');
     const emailContent = {
@@ -291,25 +292,25 @@ app.post('/api/send-email', async (req, res) => {
         </div>
       `
     };
-    
+
     console.log('📧 [AJAX Email] Sending to:', to);
-    
+
     const info = await transporter.sendMail(emailContent);
-    
-    console.log('✅ [AJAX Email] Sent successfully:', { 
-      to: to, 
-      orderId: order_id, 
+
+    console.log('✅ [AJAX Email] Sent successfully:', {
+      to: to,
+      orderId: order_id,
       messageId: info.messageId,
       timestamp: new Date().toISOString()
     });
-    
-    res.status(200).json({ 
-      success: true, 
+
+    res.status(200).json({
+      success: true,
       message: 'Email sent successfully',
       messageId: info.messageId,
       email: to
     });
-    
+
   } catch (err) {
     console.error('❌ [AJAX Email] Error sending email:', {
       error: err.message,
@@ -317,10 +318,10 @@ app.post('/api/send-email', async (req, res) => {
       orderId: order_id,
       timestamp: new Date().toISOString()
     });
-    
-    res.status(500).json({ 
-      success: false, 
-      message: 'Failed to send email: ' + err.message 
+
+    res.status(500).json({
+      success: false,
+      message: 'Failed to send email: ' + err.message
     });
   }
 });
